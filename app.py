@@ -253,7 +253,6 @@ def create_app(test_config=None):
         return jsonify({
             "success": False,
             "error": 422,
-            # TODO: delete error from message
             "message": f"Unprocessable {error}"
         }), 422
 

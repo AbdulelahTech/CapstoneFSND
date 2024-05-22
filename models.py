@@ -1,10 +1,11 @@
 import os
+from dotenv import load_dotenv
 from sqlalchemy import Column, String, Integer, Date, Table, ForeignKey
 from sqlalchemy.orm import relationship
 from flask_sqlalchemy import SQLAlchemy
 import json
 
-database_path = 'postgresql://postgres:manage@localhost:5432/capstone'
+load_dotenv()
 
 db = SQLAlchemy()
 
@@ -15,13 +16,13 @@ setup_db(app)
 
 
 def setup_test_db(app):
-    app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql://postgres:manage@localhost:5432/capstone_test'
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv('test_database_path')
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.app = app
     db.init_app(app)
 
 def setup_db(app):
-    app.config["SQLALCHEMY_DATABASE_URI"] = database_path
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv('database_path')
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.app = app
     db.init_app(app)
