@@ -62,8 +62,7 @@ def create_app(test_config=None):
                 if actor:
                     movie.actors.append(actor)
                 else:
-                    abort(404, description=f"Actor with ID {
-                        actor_id} does not exist.")
+                    abort(404, description=f"Actor with ID {actor_id} does not exist.")
             movie.insert()
             return jsonify({
                 "success": True,
@@ -98,8 +97,7 @@ def create_app(test_config=None):
                 if actor:
                     movie.actors.append(actor)
                 else:
-                    abort(404, description=f"Actor with ID {
-                        actor_id} does not exist.")
+                    abort(404, description=f"Actor with ID {actor_id} does not exist.")
 
         try:
             movie.update()
@@ -173,8 +171,7 @@ def create_app(test_config=None):
                 if movie:
                     actor.movies.append(movie)
                 else:
-                    abort(404, description=f"Movie with ID {
-                        movie_id} does not exist.")
+                    abort(404, description=f"Movie with ID {movie_id} does not exist.")
             actor.insert()
             return jsonify({
                 "success": True,
@@ -212,8 +209,7 @@ def create_app(test_config=None):
                 if movie:
                     actor.movies.append(movie)
                 else:
-                    abort(404, description=f"Movie with ID {
-                        movie_id} does not exist.")
+                    abort(404, description=f"Movie with ID {movie_id} does not exist.")
 
         try:
             actor.update()
