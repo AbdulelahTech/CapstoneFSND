@@ -1,19 +1,22 @@
-import os
 import unittest
-from flask import Flask
 from models import setup_test_db, Movies, Actors, db_drop_and_create_all
 from app import create_app
 
-class CapstoneTestCase(unittest.TestCase):
+class CapstoneTestCase(unittest.TestCase) :
     
-    def setUp(self):
+  
+    @classmethod
+    def setUpClass(self):
         """Define test variables and initialize app."""
-        self.app = create_app('testing')
+        self.app = create_app(test_config='testing')
         self.client = self.app.test_client
         
+        
+        db_drop_and_create_all()
+        
         # Binds the app to the current context
-        with self.app.app_context():
-            db_drop_and_create_all()  # reset the database for each test run
+        # with self.app.app_context():
+        # db_drop_and_create_all()  # reset the database for each test run
 
         self.new_movie = {
             "title": "Test Movie",
@@ -35,40 +38,25 @@ class CapstoneTestCase(unittest.TestCase):
         pass
     
     
+    
     # Tests for success and error case of POST /movies
     def test_create_new_movie(self):
         res = self.client().post('/movies', json=self.new_movie, headers=self.headers)
         data = res.get_json()
-        print("data")
+        print("data-2")
         print(res.data)
         self.assertEqual(res.status_code, 201)
         self.assertTrue(data['success'])
     
-    # # Tests for success and error case of GET /movies
-    # def test_get_movies(self):
-    #     res = self.client().get('/movies', headers=self.headers)
-    #     data = res.get_json()
-    #     print("data")
-    #     print(data)
-    #     self.assertEqual(res.status_code, 200)
-    #     self.assertTrue(len(data['movies']) >= 0)
-
-    # def test_404_if_movies_not_found(self):
-    #     res = self.client().get('/movies', headers=self.headers)
-    #     data = res.get_json()
-
-    #     self.assertEqual(res.status_code, 404)
-    #     self.assertEqual(data['success'], False)
-
+    # Tests for success and error case of GET /movies
+    def test_get_movies(self):
+        res = self.client().get('/movies', headers=self.headers)
+        data = res.get_json()
+        print("data")
+        print(data)
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(len(data['movies']) >= 0)
     
-    # def test_422_if_movie_creation_fails(self):
-    #     res = self.client().post('/movies', json={}, headers=self.headers)
-    #     data = res.get_json()
-
-    #     self.assertEqual(res.status_code, 422)
-    #     self.assertFalse(data['success'])
-
-    # Extend this structure for other endpoints and scenarios
 
 if __name__ == "__main__":
     unittest.main()

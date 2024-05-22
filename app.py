@@ -2,22 +2,23 @@ import os
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from models import setup_db, db_drop_and_create_all, Movies, Actors, db,setup_test_db
+from models import setup_db, db_drop_and_create_all, Movies, Actors, db, setup_test_db
 from auth import AuthError, requires_auth
+
 
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__)
     app.app_context().push()
-    
-    if test_config is None:
-        print('\033[1mDevlopment\033[0m environment')
-        setup_db(app)
-    elif test_config == "testing":
+
+    if test_config == "testing":
         print('you are now using \033[1mTesting\033[0m environment')
         setup_test_db(app)
-        
-    CORS(app)
+    else:
+        print('\033[1mDevlopment\033[0m environment')
+        setup_db(app)
+
+    CORS(app, origins='*')
     # create/reset table is db
     # db_drop_and_create_all()
 
@@ -32,7 +33,6 @@ def create_app(test_config=None):
             "movies": [movie.short() for movie in movies]
         }), 200
 
-
     @app.route('/movies/<int:movie_id>', methods=['GET'])
     @requires_auth("get:movies-detail")
     def get_movie(jwt, movie_id):
@@ -43,7 +43,6 @@ def create_app(test_config=None):
             "success": True,
             "movie": movie.long()
         }), 200
-
 
     @app.route('/movies', methods=['POST'])
     @requires_auth('post:movies')
@@ -73,7 +72,6 @@ def create_app(test_config=None):
         except Exception as e:
             db.session.rollback()
             abort(422, description=str(e))
-
 
     @app.route('/movies/<int:movie_id>', methods=['PATCH'])
     @requires_auth('patch:movies')
@@ -115,7 +113,6 @@ def create_app(test_config=None):
         finally:
             db.session.close()
 
-
     @app.route('/movies/<int:movie_id>', methods=['DELETE'])
     @requires_auth('delete:movies')
     def delete_movie(jwt, movie_id):
@@ -137,7 +134,6 @@ def create_app(test_config=None):
 
     # Actors Routes:
 
-
     @app.route('/actors', methods=['GET'])
     @requires_auth("get:actors")
     def get_actors(jwt):
@@ -146,7 +142,6 @@ def create_app(test_config=None):
             "success": True,
             "actors": [actor.short() for actor in actors]
         }), 200
-
 
     @app.route('/actors/<int:actor_id>', methods=['GET'])
     @requires_auth("get:actors-detail")
@@ -158,7 +153,6 @@ def create_app(test_config=None):
             "success": True,
             "actor": actor.long()
         }), 200
-
 
     @app.route('/actors', methods=['POST'])
     @requires_auth('post:actors')
@@ -189,7 +183,6 @@ def create_app(test_config=None):
         except Exception as e:
             db.session.rollback()
             abort(422, description=str(e))
-
 
     @app.route('/actors/<int:actor_id>', methods=['PATCH'])
     @requires_auth('patch:actors')
@@ -234,7 +227,6 @@ def create_app(test_config=None):
         finally:
             db.session.close()
 
-
     @app.route('/actors/<int:actor_id>', methods=['DELETE'])
     @requires_auth('delete:actors')
     def delete_actor(jwt, actor_id):
@@ -254,8 +246,8 @@ def create_app(test_config=None):
         finally:
             db.session.close()
 
-
     # Error Handling
+
     @app.errorhandler(422)
     def unprocessable(error):
         return jsonify({
@@ -265,7 +257,6 @@ def create_app(test_config=None):
             "message": f"Unprocessable {error}"
         }), 422
 
-
     @app.errorhandler(404)
     def not_found(error):
         return jsonify({
@@ -273,7 +264,6 @@ def create_app(test_config=None):
             "error": 404,
             "message": error.description
         }), 404
-
 
     @app.errorhandler(400)
     def bad_request(error):
@@ -283,7 +273,6 @@ def create_app(test_config=None):
             "message": error.description
         }), 400
 
-
     @app.errorhandler(500)
     def server_error(error):
         return jsonify({
@@ -292,7 +281,6 @@ def create_app(test_config=None):
             "message": "Internal Server Error"
         }), 500
 
-
     @app.errorhandler(AuthError)
     def unauthorized(error: AuthError):
         return jsonify({
@@ -300,10 +288,11 @@ def create_app(test_config=None):
             "error": error.status_code,
             "message": error.error['description']
         }), error.status_code
-    
+
     return app
 
-APP = create_app() 
+
+APP = create_app()
 
 if __name__ == '__main__':
     APP.run(host='0.0.0.0', port=8080, debug=True)
