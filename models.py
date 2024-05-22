@@ -5,7 +5,8 @@ from sqlalchemy.orm import relationship
 from flask_sqlalchemy import SQLAlchemy
 import json
 
-load_dotenv()
+# TODO: uncomment this line to use a local database
+# load_dotenv()
 
 db = SQLAlchemy()
 
