@@ -20,7 +20,7 @@ def create_app(test_config=None):
 
     CORS(app, origins='*')
     # create/reset table is db
-    # db_drop_and_create_all()
+    db_drop_and_create_all()
 
     # Movies Routes
 
