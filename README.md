@@ -19,12 +19,13 @@ This Flask application provides a backend API for managing movies and actors for
 5. Run the application using `python app.py`.
 
 ## JWT tokens
-To obtain a JWT token for a specifc role please go to [this login page](https://dev-dqnmvd3dnv6o1ey2.us.auth0.com/authorize?audience=https://movies_actors/&response_type=token&client_id=K7r8AFmOfuX8CepOJh2K8bLAxTwKHkZ0), then sign in with desired user as bellow:
+To obtain a JWT token for a specifc role please go to [this login page](https://dev-dqnmvd3dnv6o1ey2.us.auth0.com/authorize?audience=https://movies_actors/&response_type=token&client_id=K7r8AFmOfuX8CepOJh2K8bLAxTwKHkZ0&redirect_uri=https://127.0.0.1:8080/login-result), then sign in with desired user as bellow:
 
 **Executive Producer**
 
 - Email: executiveproducer@capstone.com 
 - Password: ExecutiveProducer@24
+- Token: [token](eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkE1bTNmeEVzcnhzZkVxbjhwOHZSbCJ9.eyJpc3MiOiJodHRwczovL2Rldi1kcW5tdmQzZG52Nm8xZXkyLnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw2NjRjOWUzNmZjYWNkY2FhN2ZlMzNiYjgiLCJhdWQiOiJodHRwczovL21vdmllc19hY3RvcnMvIiwiaWF0IjoxNzE2NDUxMjE0LCJleHAiOjE3MTY1Mzc2MTQsInNjb3BlIjoiIiwiYXpwIjoiSzdyOEFGbU9mdVg4Q2VwT0poMks4YkxBeFR3S0hrWjAiLCJwZXJtaXNzaW9ucyI6WyJkZWxldGU6YWN0b3JzIiwiZGVsZXRlOm1vdmllcyIsImdldDphY3RvcnMiLCJnZXQ6YWN0b3JzLWRldGFpbCIsImdldDptb3ZpZXMiLCJnZXQ6bW92aWVzLWRldGFpbCIsInBhdGNoOmFjdG9ycyIsInBhdGNoOm1vdmllcyIsInBvc3Q6YWN0b3JzIiwicG9zdDptb3ZpZXMiXX0.f_-hU4Beiy1W60q4u7utwbCw4d6Xz2VfJ9SIgSu4fnI5Sz5NP3CHlbrTvOIt0HB1FDrI72UzG-34JuGp44QhV4ZESwwpqCTYgEv0wJyVaawvtQGNzkEjGmjjp4OUQ4ElvbUgE3-5JWfD5bdsld6XB5Ux1IDdvIOEbbwROasso5lVrA6NzQWVkvEZORrJy8mty7SJFXnjFI34tmTcMdFiUwp4vvZ_F3E66CX2k9wOKr0USYCySZqCyT1UnY-C44FJ0TivhYe2eweILgIltd0GdFzmaAOyRX85V-S6kjeugnOoij7B1e-ZczVv62bcpIBHh1TcMK9JKiQpglGOvp_lqA)
 
 **Casting Director**
 
