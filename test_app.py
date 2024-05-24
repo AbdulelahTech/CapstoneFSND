@@ -1,6 +1,7 @@
 import unittest
 from models import setup_test_db, Movies, Actors, db_drop_and_create_all
 from app import create_app
+import os
 
 class CapstoneTestCase(unittest.TestCase) :
     
@@ -34,18 +35,60 @@ class CapstoneTestCase(unittest.TestCase) :
             "gender": "Female"
         }
         
-        self.headers = {
-            "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IkE1bTNmeEVzcnhzZkVxbjhwOHZSbCJ9.eyJpc3MiOiJodHRwczovL2Rldi1kcW5tdmQzZG52Nm8xZXkyLnVzLmF1dGgwLmNvbS8iLCJzdWIiOiJhdXRoMHw2NjRjOWUzNmZjYWNkY2FhN2ZlMzNiYjgiLCJhdWQiOiJodHRwczovL21vdmllc19hY3RvcnMvIiwiaWF0IjoxNzE2Mjk3MzAwLCJleHAiOjE3MTYzODM3MDAsInNjb3BlIjoiIiwiYXpwIjoiSzdyOEFGbU9mdVg4Q2VwT0poMks4YkxBeFR3S0hrWjAiLCJwZXJtaXNzaW9ucyI6WyJkZWxldGU6YWN0b3JzIiwiZGVsZXRlOm1vdmllcyIsImdldDphY3RvcnMiLCJnZXQ6YWN0b3JzLWRldGFpbCIsImdldDptb3ZpZXMiLCJnZXQ6bW92aWVzLWRldGFpbCIsInBhdGNoOmFjdG9ycyIsInBhdGNoOm1vdmllcyIsInBvc3Q6YWN0b3JzIiwicG9zdDptb3ZpZXMiXX0.QYiKLTGcnnei533q9jnnYmoGzKFqn57RoPeb9FfTApPo4gVaJI0Rg6iUKciDgO5a2ApImo_DnAeJupmgNSL2j9JxPC_ZB-wpYN2Akk-GMBgF5-obCC3T2IvIC1NdtWY3EptcvQd3355X2ZLVMZfGt-MWumyCNPTxoN2oDD6VDuxdkNtLPPzl0yOh1IXbiGGLyFO8gzj2517H1m6eH5tRm0JR9iqLku3AKPEjX_UFZYCpoKjrpNrdL94GtGjCCvejYYcaqtSFBu5qcCUZlylMl4ujuPXKwE3E31umoLFEi06Bfs113KYjCsYHe4TO2D7zjHP3M0b-lb5y0KTYxKUaQg"
+        self.executiveProducerAuth = {
+            "Authorization": f"Bearer {os.getenv('ExecutiveProducerJWT')}"
+        }
+        self.CastingDirectorAuth = {
+            "Authorization": f"Bearer {os.getenv('CastingDirectorJWT')}"
+        }
+        self.CastingAssistantAuth = {
+            "Authorization": f"Bearer {os.getenv('CastingAssistantJWT')}"
         }
 
     def tearDown(self):
         """Executed after each test"""
         pass
     
+    # Test for Casting Director role
+    # Success
+    def test_get_all_movies_casting_director(self):
+        res = self.client().get('/movies', headers=self.CastingDirectorAuth)
+        data = res.get_json()
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['success'])
+        self.assertIsInstance(data['movies'], list)
+    # Failure
+    def test_create_new_movie_casting_director(self):
+        res = self.client().post('/movies', headers=self.CastingDirectorAuth, json=self.new_movie)
+        data = res.get_json()
+
+        self.assertEqual(res.status_code, 403)
+        self.assertFalse(data['success'])
+    
+    
+    # Test for Casting Assistant role
+    # Success
+    def test_get_all_movies_casting_assistant(self):
+        res = self.client().get('/movies', headers=self.CastingAssistantAuth)
+        data = res.get_json()
+
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(data['success'])
+        self.assertIsInstance(data['movies'], list)
+    # Failure
+    def test_create_new_movie_casting_assistant(self):
+        res = self.client().post('/movies', headers=self.CastingAssistantAuth, json=self.new_movie)
+        data = res.get_json()
+
+        self.assertEqual(res.status_code, 403)
+        self.assertFalse(data['success'])
+    
+    # Test for Executive Producer role for every route(success/failure)
     # Tests for Movies
     def test_create_new_movie(self):
-        res = self.client().post('/movies', headers=self.headers, json=self.new_movie)
-        res = self.client().post('/movies', headers=self.headers, json=self.new_movie_to_delete)
+        res = self.client().post('/movies', headers=self.executiveProducerAuth, json=self.new_movie)
+        res = self.client().post('/movies', headers=self.executiveProducerAuth, json=self.new_movie_to_delete)
         data = res.get_json()
 
         self.assertEqual(res.status_code, 201)
@@ -53,14 +96,14 @@ class CapstoneTestCase(unittest.TestCase) :
 
     def test_400_if_movie_creation_fails(self):
         # Sending an incomplete request
-        res = self.client().post('/movies', headers=self.headers, json={"title": "Incomplete"})
+        res = self.client().post('/movies', headers=self.executiveProducerAuth, json={"title": "Incomplete"})
         data = res.get_json()
 
         self.assertEqual(res.status_code, 400)
         self.assertFalse(data['success'])
     
     def test_get_specific_movie(self):
-        res = self.client().get('/movies/1', headers=self.headers)
+        res = self.client().get('/movies/1', headers=self.executiveProducerAuth)
         data = res.get_json()
 
         self.assertEqual(res.status_code, 200)
@@ -70,14 +113,14 @@ class CapstoneTestCase(unittest.TestCase) :
 
     def test_404_if_movie_not_found(self):
         # Requesting a non-existent movie id
-        res = self.client().get('/movies/1000', headers=self.headers)
+        res = self.client().get('/movies/1000', headers=self.executiveProducerAuth)
         data = res.get_json()
 
         self.assertEqual(res.status_code, 404)
         self.assertFalse(data['success'])
     
     def test_get_all_movies(self):
-        res = self.client().get('/movies', headers=self.headers)
+        res = self.client().get('/movies', headers=self.executiveProducerAuth)
         data = res.get_json()
 
         self.assertEqual(res.status_code, 200)
@@ -86,8 +129,8 @@ class CapstoneTestCase(unittest.TestCase) :
 
     # Tests for Actors
     def test_create_new_actor(self):
-        res = self.client().post('/actors', headers=self.headers, json=self.new_actor)
-        res = self.client().post('/actors', headers=self.headers, json=self.new_actor_to_delete)
+        res = self.client().post('/actors', headers=self.executiveProducerAuth, json=self.new_actor)
+        res = self.client().post('/actors', headers=self.executiveProducerAuth, json=self.new_actor_to_delete)
         data = res.get_json()
 
         self.assertEqual(res.status_code, 201)
@@ -95,14 +138,14 @@ class CapstoneTestCase(unittest.TestCase) :
 
     def test_400_if_actor_creation_fails(self):
         # Sending an incomplete request
-        res = self.client().post('/actors', headers=self.headers, json={"name": "Missing Age and Gender"})
+        res = self.client().post('/actors', headers=self.executiveProducerAuth, json={"name": "Missing Age and Gender"})
         data = res.get_json()
 
         self.assertEqual(res.status_code, 400)
         self.assertFalse(data['success'])
 
     def test_get_specific_actor(self):
-        res = self.client().get('/actors/1', headers=self.headers)
+        res = self.client().get('/actors/1', headers=self.executiveProducerAuth)
         data = res.get_json()
 
         self.assertEqual(res.status_code, 200)
@@ -112,14 +155,14 @@ class CapstoneTestCase(unittest.TestCase) :
 
     def test_404_if_actor_not_found(self):
         # Requesting a non-existent actor id
-        res = self.client().get('/actors/1000', headers=self.headers)
+        res = self.client().get('/actors/1000', headers=self.executiveProducerAuth)
         data = res.get_json()
 
         self.assertEqual(res.status_code, 404)
         self.assertFalse(data['success'])
     
     def test_get_all_actors(self):
-        res = self.client().get('/actors', headers=self.headers)
+        res = self.client().get('/actors', headers=self.executiveProducerAuth)
         data = res.get_json()
 
         self.assertEqual(res.status_code, 200)
@@ -128,7 +171,7 @@ class CapstoneTestCase(unittest.TestCase) :
 
     def test_update_movie(self):
         update = {"title": "Updated Movie Title"}
-        res = self.client().patch('/movies/1', headers=self.headers, json=update)
+        res = self.client().patch('/movies/1', headers=self.executiveProducerAuth, json=update)
         data = res.get_json()
 
         self.assertEqual(res.status_code, 200)
@@ -136,7 +179,7 @@ class CapstoneTestCase(unittest.TestCase) :
 
     def test_404_if_movie_does_not_exist_to_update(self):
         update = {"title": "Nonexistent Movie"}
-        res = self.client().patch('/movies/9999', headers=self.headers, json=update)
+        res = self.client().patch('/movies/9999', headers=self.executiveProducerAuth, json=update)
         data = res.get_json()
 
         self.assertEqual(res.status_code, 404)
@@ -144,7 +187,7 @@ class CapstoneTestCase(unittest.TestCase) :
     
     def test_update_movie(self):
         movie = {'title': 'Updated Title'}
-        res = self.client().patch('/movies/1', headers=self.headers, json=movie)
+        res = self.client().patch('/movies/1', headers=self.executiveProducerAuth, json=movie)
         data = res.get_json()
 
         self.assertEqual(res.status_code, 200)
@@ -152,7 +195,7 @@ class CapstoneTestCase(unittest.TestCase) :
         self.assertIn('updated', data)
 
     def test_404_update_movie_not_found(self):
-        res = self.client().patch('/movies/999', headers=self.headers, json={"title": "No Such Movie"})
+        res = self.client().patch('/movies/999', headers=self.executiveProducerAuth, json={"title": "No Such Movie"})
         data = res.get_json()
 
         self.assertEqual(res.status_code, 404)
@@ -160,7 +203,7 @@ class CapstoneTestCase(unittest.TestCase) :
 
     def test_update_actor(self):
         actor = {'name': 'Updated Actor Name'}
-        res = self.client().patch('/actors/1', headers=self.headers, json=actor)
+        res = self.client().patch('/actors/1', headers=self.executiveProducerAuth, json=actor)
         data = res.get_json()
 
         self.assertEqual(res.status_code, 200)
@@ -168,7 +211,7 @@ class CapstoneTestCase(unittest.TestCase) :
         self.assertIn('updated', data)
 
     def test_404_update_actor_not_found(self):
-        res = self.client().patch('/actors/999', headers=self.headers, json={"name": "No Such Actor"})
+        res = self.client().patch('/actors/999', headers=self.executiveProducerAuth, json={"name": "No Such Actor"})
         data = res.get_json()
 
         self.assertEqual(res.status_code, 404)
@@ -176,7 +219,7 @@ class CapstoneTestCase(unittest.TestCase) :
 
     # Delete Tests
     def test_delete_movie(self):
-        res = self.client().delete('/movies/2', headers=self.headers)
+        res = self.client().delete('/movies/2', headers=self.executiveProducerAuth)
         data = res.get_json()
 
         self.assertEqual(res.status_code, 200)
@@ -184,14 +227,14 @@ class CapstoneTestCase(unittest.TestCase) :
         self.assertIn('deleted', data)
 
     def test_404_delete_movie_not_found(self):
-        res = self.client().delete('/movies/999', headers=self.headers)
+        res = self.client().delete('/movies/999', headers=self.executiveProducerAuth)
         data = res.get_json()
 
         self.assertEqual(res.status_code, 404)
         self.assertFalse(data['success'])
 
     def test_delete_actor(self):
-        res = self.client().delete('/actors/2', headers=self.headers)
+        res = self.client().delete('/actors/2', headers=self.executiveProducerAuth)
         data = res.get_json()
 
         self.assertEqual(res.status_code, 200)
@@ -199,7 +242,7 @@ class CapstoneTestCase(unittest.TestCase) :
         self.assertIn('deleted', data)
 
     def test_404_delete_actor_not_found(self):
-        res = self.client().delete('/actors/999', headers=self.headers)
+        res = self.client().delete('/actors/999', headers=self.executiveProducerAuth)
         data = res.get_json()
 
         self.assertEqual(res.status_code, 404)

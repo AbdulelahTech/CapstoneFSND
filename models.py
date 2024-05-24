@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 import json
 
 # TODO: uncomment this line to use a local database
-# load_dotenv()
+load_dotenv()
 
 db = SQLAlchemy()
 
@@ -23,7 +23,7 @@ def setup_test_db(app):
     db.init_app(app)
 
 def setup_db(app):
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv('database_path')
+    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv('dev_database_path')
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.app = app
     db.init_app(app)
